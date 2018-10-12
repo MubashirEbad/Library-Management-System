@@ -1,0 +1,238 @@
+<html>
+
+<head>
+
+	<link rel="stylesheet" href="stylesheet.css" type="text/css">
+	<script src="MainJS.js" type="text/javascript"> </script>
+
+	<script>
+		var index = 1;
+
+		function innerCall() {
+			a = "sdfsdfd";
+			let result;
+			let flag = 0;				//0 for empty, 1 for exists
+			if (sessionStorage.getItem("arrayOfBooks") === null) {
+				let temparray = getArray();
+				result = [...temparray];
+			}
+			else {
+				flag = 1;
+				result = JSON.parse(sessionStorage.getItem("arrayOfBooks"));
+			}
+
+			let table = document.getElementById('main-table');
+
+			for (let a = 0; a < result.length; a++) {
+				var row = table.insertRow(index);
+				row.insertCell(0).innerHTML = index;
+
+				index++;
+				for (let b = 0; b < result[a].length; b++) {
+
+					let cell = row.insertCell(b + 1);
+					cell.contentEditable = true;
+					cell.innerHTML = result[a][b];
+				}
+
+				//The delete button in last column
+				let cell = row.insertCell(5);
+
+				let delBtn = document.createElement("button");
+				delBtn.appendChild(document.createTextNode("Delete"));
+				delBtn.onclick = function () {
+					deleteRow(a + 1);
+				};
+				cell.appendChild(delBtn);
+
+				let updBtn = document.createElement("button");
+				updBtn.appendChild(document.createTextNode("Update"));
+				updBtn.onclick = function () {
+					updateRow(a + 1);
+				};
+				cell.appendChild(updBtn);
+			}
+			if (flag == 0) {
+				console.log("came");
+
+				sessionStorage.setItem("arrayOfBooks", JSON.stringify(result));
+				sessionStorage.setItem("arrayOfAuthors", JSON.stringify(updateTheAuthors(result)));
+				sessionStorage.setItem("arrayOfPublishers", JSON.stringify(updateThePublishers(result)));
+				console.log([result]);
+			}
+			else {
+				sessionStorage.removeItem("arrayOfBooks");
+				sessionStorage.setItem("arrayOfBooks", JSON.stringify(result));
+			}
+		}
+
+		function updateTheAuthors(result) {
+			let authors = [];
+			for (let a = 0; a < result.length; a++) {
+				let check = 0;
+				for (let b = 0; b < authors.length; b++) {
+					if (authors[b][0] == result[a][1]) {
+						authors[b][1]++;
+						check = 1;
+					}
+				}
+				if (check != 1) {
+					authors.push([result[a][1], 1, result[a][2]]);
+				}
+
+			}
+			return authors;
+		}
+
+		function updateThePublishers(result) {
+			let publishers = [];
+			for (let a = 0; a < result.length; a++) {
+				let check = 0;
+
+				for (let b = 0; b < publishers.length; b++) {
+					if (publishers[b][0] == result[a][2]) {
+						publishers[b][1]++;
+						check = 1;
+					}
+				}
+				if (check != 1) {
+					publishers.push([result[a][2], 1, result[a][1]]);
+				}
+
+			}
+
+			return publishers;
+		}
+
+		function deleteRow(a) {
+
+			const table = document.getElementById('main-table');
+			const book = table.rows[a].cells[1].innerHTML;
+			const auth = table.rows[a].cells[2].innerHTML;
+			const pub = table.rows[a].cells[3].innerHTML;
+
+			//Remove row from the table
+			table.deleteRow(a);
+
+			//Get the arrays from the session storage.
+			let result = JSON.parse(sessionStorage.getItem("arrayOfBooks"));
+			let authors = JSON.parse(sessionStorage.getItem("arrayOfAuthors"));
+			let publishers = JSON.parse(sessionStorage.getItem("arrayOfPublishers"));
+
+			//Filter the array to remove the publisher selected.
+
+			result = result.filter(
+				(row) => (row[1] !== auth) && (row[0] !== book)
+			);
+
+			let flag = 0;
+			let index = 0;
+			let newAuthors = authors.map(function (row) {
+				if (row[0] === auth) {
+					if (row[1] > 1) {
+						flag = 1;
+						return [row[0], --row[1], row[2]];
+					}
+					else {
+						return [row[0], row[1], row[2]];
+					}
+				}
+				else {
+					return [row[0], row[1], row[2]];
+				}
+			});
+			if (flag != 1) {
+				newAuthors = newAuthors.filter(
+					(row) => row[0] !== auth
+				);
+			}
+
+			flag = 0;
+			let newPublishers = publishers.map(function (row) {
+				if (row[2] === auth) {
+					if (row[1] > 1) {
+						flag = 1;
+						return [row[0], --row[1], row[2]];
+					}
+					else {
+						return [row[0], row[1], row[2]];
+					}
+				}
+				else {
+					return [row[0], row[1], row[2]];
+				}
+			});
+
+			if (flag != 1) {
+				newPublishers = newPublishers.filter(
+					(row) => row[0] !== pub
+				);
+			}
+
+			//Console to check its working.
+			console.log([publishers]);
+			console.log([result]);
+
+			sessionStorage.removeItem("arrayOfPublishers");
+			sessionStorage.removeItem("arrayOfBooks");
+			sessionStorage.removeItem("arrayOfAuthors");
+
+			sessionStorage.setItem("arrayOfBooks", JSON.stringify(result));
+			sessionStorage.setItem("arrayOfAuthors", JSON.stringify(newAuthors));
+			sessionStorage.setItem("arrayOfPublishers", JSON.stringify(newPublishers));
+		}
+
+		function updateRow(a) {
+			let table = document.getElementById('main-table');
+			let results = JSON.parse(sessionStorage.getItem("arrayOfBooks"));
+			let authors = JSON.parse(sessionStorage.getItem("arrayOfAuthors"));
+			let publishers = JSON.parse(sessionStorage.getItem("arrayOfPublishers"));
+
+			console.log(a);
+			console.log(table.rows[a].cells[1].innerHTML);
+			console.log(results[a - 1][0]);
+
+			let b = a - 1;
+
+			results[b][0] = table.rows[a].cells[1].innerHTML;
+			results[b][1] = table.rows[a].cells[2].innerHTML;
+			results[b][2] = table.rows[a].cells[3].innerHTML;
+			results[b][3] = table.rows[a].cells[4].innerHTML;
+
+			sessionStorage.removeItem("arrayOfBooks");
+			sessionStorage.removeItem("arrayOfAuthors");
+			sessionStorage.removeItem("arrayOfPublishers");
+
+			sessionStorage.setItem("arrayOfBooks", JSON.stringify(results));
+			sessionStorage.setItem("arrayOfAuthors", JSON.stringify(updateTheAuthors(results)));
+			sessionStorage.setItem("arrayOfPublishers", JSON.stringify(updateThePublishers(results)));
+
+			console.log([results]);
+		}
+
+	</script>
+</head>
+
+<body onload="innerCall()">
+
+	<h1 class="header-style"> Library Management System </h1>
+	<a href="AuthorsWithCount.html"><input type="button" value="Authors" class="main-buttons text-style"> </a>
+	<a href="PublisherWithCount.html"><input type="button" value="Publishers" class="main-buttons text-style"> </a>
+	<br> <br>
+	<table id="main-table" border="1px" cellpadding="5">
+		<th class="text-style"> Number </th>
+		<th class="text-style"> Book Name </th>
+		<th class="text-style"> Author </th>
+		<th class="text-style"> Publisher </th>
+		<th class="text-style"> Date </th>
+		<th class="text-style"> Actions </th>
+	</table>
+	<br>
+	<a href="AddBook.html"><input type="button" value="Add a book" id="AddNewBook" onclick="AddNewBook()"> </a>
+
+
+
+
+</body>
+
+</html>

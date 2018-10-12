@@ -1,0 +1,26 @@
+.header-style
+{
+	color:#093;
+}
+.text-style
+{
+	color:white;
+	border:none;
+	background-color:#093;
+	font-size:16px;
+	
+}
+.main-buttons
+{
+	border:none;
+	height:30px;
+}
+.textbox-style
+{
+	height: 30px;
+	width: 60%;
+}
+table-style
+{
+	width: 80%;
+}

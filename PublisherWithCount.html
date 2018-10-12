@@ -1,0 +1,81 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="stylesheet.css" type="text/css">
+
+    <script>
+        function LoadData() {
+            let index = 1;
+            let result = JSON.parse(sessionStorage.getItem("arrayOfPublishers"));
+            let table = document.getElementById('main-table');
+            console.log([result]);
+            for (let a = 0; a < result.length; a++) {
+                var row = table.insertRow(index);
+                index++;
+                for (let b = 0; b < result[a].length - 1; b++) {
+                    let cell = row.insertCell(b);
+                    cell.innerHTML = result[a][b];
+                }
+
+                let cell = row.insertCell(2);
+                let delBtn = document.createElement("button");
+                delBtn.appendChild(document.createTextNode("Delete"));
+                delBtn.onclick = function () {
+                    deleteRow(a + 1);
+                };
+                cell.appendChild(delBtn);
+
+            }
+        }
+
+        function deleteRow(a) {
+            let table = document.getElementById('main-table');
+            let pub = table.rows[a].cells[0].innerHTML;
+
+            //Remove row from the table
+            table.deleteRow(a);
+
+            //Get the arrays from the session storage.
+            let publishers = JSON.parse(sessionStorage.getItem("arrayOfPublishers"));
+            let result = JSON.parse(sessionStorage.getItem("arrayOfBooks"));
+            let authors = JSON.parse(sessionStorage.getItem("arrayOfAuthors"));
+
+            //Filter the array to remove the publisher selected.
+            publishers = publishers.filter(
+                (num) => num[0] !== pub
+            );
+
+            result = result.filter(
+                (row) => row[2] !== pub
+            );
+
+            authors = authors.filter(
+                (row) => row[2] != pub
+            );
+
+            sessionStorage.removeItem("arrayOfPublishers");
+            sessionStorage.removeItem("arrayOfBooks");
+            sessionStorage.removeItem("arrayOfAuthors");
+
+            sessionStorage.setItem("arrayOfPublishers", JSON.stringify(publishers));
+            sessionStorage.setItem("arrayOfBooks", JSON.stringify(result));
+            sessionStorage.setItem("arrayOfAuthors", JSON.stringify(authors));
+        }
+
+    </script>
+</head>
+
+<body onload="LoadData()">
+
+    <h1 class="header-style"> Library Management System </h1>
+
+    <table id="main-table" border="1px" cellpadding="5">
+        <th class="text-style"> Publisher </th>
+        <th class="text-style"> Number of Books </th>
+        <th class="text-style"> Actions </th>
+    </table>
+    <br> <br>
+    <a href="index.html"> <input type="button" value="Go Back!"> </a>
+</body>
+
+</html>

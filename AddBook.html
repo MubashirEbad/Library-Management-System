@@ -1,0 +1,112 @@
+
+
+<html>
+
+<head>
+
+    <link rel="stylesheet" href="stylesheet.css" type="text/css">
+    <script src="MainJS.js" type="text/javascript"> </script>
+    <script>
+        function AddNewBook()
+        {
+            //Get the details object from the session storage.
+            var result = JSON.parse(sessionStorage.getItem("arrayOfBooks"));
+            
+            //Get the values from the text fields.
+            var bName = document.getElementById('bname').value;
+            var aName = document.getElementById('aname').value;
+            var publisher = document.getElementById('publisher').value;
+            var date = document.getElementById('date').value;
+
+            //Use the push() function to add new element to the array.
+            result.push([bName, aName, publisher, date]);
+
+            //Alert the successfull addition of book.
+
+            //Clear all the fields
+
+            // pushElement(bName, aName, publisher, date);
+            let authors = JSON.parse(sessionStorage.getItem("arrayOfAuthors"));
+            let publishers = JSON.parse(sessionStorage.getItem("arrayOfPublishers"));
+            
+            console.log([publishers]);
+            let flag = 0;
+            
+            //Map the data to the array.
+            const newAuthors = authors.map(function(row)
+            {
+                if(row[0] === aName)
+                {
+                   flag = 1;
+                   return [row[0], ++row[1], row[2]];
+                }
+                else
+                {
+                    return [row[0], row[1], row[2]];
+                }
+            });
+            //If author is not present currently.
+            if(flag != 1)
+            {
+                newAuthors.push([aName, 1, publisher]);
+            }
+            
+            //Reset flag for next segment.
+            flag = 0;
+
+            //Map the data to the array.
+            const newPublishers = publishers.map(function(row)
+            {
+                if(row[0] === publisher)
+                {
+                   flag = 1;
+                   return [row[0], ++row[1], row[2]];
+                }
+                else
+                {
+                    return [row[0], row[1], row[2]];
+                }
+            });
+            //If publisher is not present currently.
+            if(flag != 1)
+            {
+                newPublishers.push([publisher, 1, aName]);
+            }
+            
+            sessionStorage.removeItem("arrayOfAuthors");
+            sessionStorage.removeItem("arrayOfPublishers");
+            sessionStorage.removeItem("arrayOfBooks");
+
+            sessionStorage.setItem("arrayOfBooks", JSON.stringify(result));
+            sessionStorage.setItem("arrayOfAuthors", JSON.stringify(newAuthors));
+            sessionStorage.setItem("arrayOfPublishers", JSON.stringify(newPublishers));
+            alert("Book Successfully added!!");
+            // for(let a=0;a<authors.length;a++)
+            // {
+            //     console.log(authors[a]);
+            // }
+        }
+    </script>
+</head>
+
+<body>
+
+    <h1 class="header-style"> Library Management System </h1>
+    <h3 class="header-style"> Add New Book </h3>
+
+    <form onsubmit="AddNewBook()">
+        <p><input type="text" placeholder="Book Name" required class="textbox-style" id="bname" name="ajeeb"> </p>
+        <p><input type="text" placeholder="Author Name" required class="textbox-style" id="aname"> </p>
+        <p><input type="text" placeholder="Publisher" required class="textbox-style" id="publisher"> </p>
+        <p><input type="date" placeholder="mm/dd/yyyy" required class="textbox-style" id="date"> </p>
+        <button type="submit"> Submit </button>
+    </form>
+   
+
+    <a href="index.html"> <input type="button" value="Go Back!"> </a>
+    <div class="grid-table">
+        <div id="Row1">
+    </div>
+
+</body>
+</html>
